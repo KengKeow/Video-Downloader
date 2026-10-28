@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090909">
+  <meta name="description" content="SaveNest. A dark minimal YouTube video utility for videos you own or have permission to save.">
+  <title>SaveNest | Dark minimal video downloads</title>
+  <style>
+    :root{
+      --bg:#090909;
+      --bg-soft:#101010;
+      --card:#121212;
+      --card-2:#171717;
+      --line:#252525;
+      --line-soft:#1d1d1d;
+      --text:#f3f3f3;
+      --muted:#9d9d9d;
+      --muted-2:#777;
+      --accent:#ffffff;
+      --shadow:0 24px 64px rgba(0,0,0,.45);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+      color:var(--text)
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:radial-gradient(circle at top, #171717 0%, #0b0b0b 38%, #090909 100%);-webkit-font-smoothing:antialiased;color:var(--text)}
+    button,input,a{font:inherit}
+    a{color:inherit;text-decoration:none}
+    button{cursor:pointer}
+    button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid #fff;outline-offset:3px}
+    .shell{width:min(1120px,calc(100% - 42px));margin:auto}
+    .topbar{position:sticky;top:0;z-index:10;background:rgba(9,9,9,.78);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.06)}
+    .nav{height:76px;display:flex;align-items:center;justify-content:space-between;gap:22px}
+    .brand{display:flex;align-items:center;gap:13px;font-size:22px;font-weight:800;letter-spacing:-.05em}
+    .logo{width:38px;height:38px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:linear-gradient(180deg,#1a1a1a,#111);display:grid;place-items:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+    .brand .sub{color:#8e8e8e;font-weight:700}
+    .navlinks{display:flex;align-items:center;gap:28px;color:#b5b5b5;font-size:14px}
+    .navlinks a:hover{color:#fff}
+    .badge{border:1px solid rgba(255,255,255,.09);background:#111;padding:9px 13px;border-radius:999px;font-size:12px;color:#d4d4d4}
+    .hero{padding:78px 0 90px;position:relative}
+    .hero-content{max-width:880px;margin:0 auto;text-align:center}
+    .eyebrow{display:inline-flex;align-items:center;gap:9px;padding:8px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#c3c3c3;font-weight:700}
+    .dot{width:7px;height:7px;border-radius:999px;background:#fff;opacity:.92}
+    h1{font-size:clamp(40px,6vw,76px);line-height:1.02;letter-spacing:-.075em;margin:24px auto 20px;max-width:820px;font-weight:850}
+    h1 .dim{color:#7e7e7e;font-weight:780}
+    .lead{max-width:630px;margin:0 auto 34px;color:#a1a1a1;font-size:16px;line-height:1.8}
+    .search-panel{max-width:860px;margin:0 auto;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);border-radius:28px;padding:14px;box-shadow:var(--shadow)}
+    .form-wrap{display:flex;gap:12px;align-items:center;border-radius:22px;background:var(--bg-soft);border:1px solid var(--line);padding:10px}
+    .input-wrap{display:flex;align-items:center;gap:12px;flex:1;min-width:0;padding:0 10px}
+    .input-wrap svg{color:#757575;flex:none}
+    .input-wrap input{width:100%;min-width:0;background:transparent;border:0;outline:0;color:#fff;padding:15px 0;font-size:15px}
+    .input-wrap input::placeholder{color:#666}
+    .ghost-btn,.primary{border-radius:16px;border:1px solid var(--line);padding:14px 18px;display:inline-flex;align-items:center;gap:9px;font-weight:700;flex:none;transition:transform .18s ease, background .18s ease, border-color .18s ease}
+    .ghost-btn{background:#141414;color:#d6d6d6}
+    .ghost-btn:hover{background:#181818;border-color:#303030;transform:translateY(-1px)}
+    .primary{background:#f5f5f5;color:#0d0d0d;border-color:#f5f5f5;padding-inline:22px}
+    .primary:hover{background:#ffffff;transform:translateY(-1px)}
+    .primary:disabled{opacity:.68;cursor:wait;transform:none}
+    .subrow{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap;padding:14px 6px 2px}
+    .supported{display:flex;flex-wrap:wrap;gap:10px;align-items:center;color:#7f7f7f;font-size:12px}
+    .supported strong{color:#d5d5d5;font-weight:700}
+    .feedback{margin:16px 2px 2px;font-size:13px;line-height:1.5;color:#c8a35c;min-height:20px;text-align:left}
+    .feedback.success{color:#8fe2ad}.feedback.error{color:#f09494}
+    .preview-area{margin:26px auto 0;text-align:left;max-width:860px;display:none}
+    .preview-area.is-visible{display:block;animation:rise .28s ease-out}
+    @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .result{background:linear-gradient(180deg,#131313,#101010);border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:20px;display:grid;grid-template-columns:260px minmax(0,1fr);gap:22px;box-shadow:var(--shadow)}
+    .thumb{aspect-ratio:16/9;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,#1b1b1b,#0f0f0f);border:1px solid rgba(255,255,255,.06);position:relative;display:grid;place-items:center}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:none}
+    .playicon{position:absolute;width:54px;height:54px;border-radius:999px;background:rgba(0,0,0,.45);backdrop-filter:blur(7px);display:grid;place-items:center;border:1px solid rgba(255,255,255,.14)}
+    .smallcaps{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8a8a8a;font-weight:700;margin-top:3px}
+    .result-title{font-size:22px;font-weight:780;letter-spacing:-.03em;margin:8px 0 10px;line-height:1.35;overflow-wrap:anywhere}
+    .result-meta{font-size:13px;color:#9b9b9b;margin-bottom:18px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+    .format-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .format-button{border:1px solid rgba(255,255,255,.1);background:#181818;color:#efefef;padding:11px 15px;border-radius:12px;font-size:13px;font-weight:700;display:inline-flex;gap:8px;align-items:center}
+    .format-button:hover{background:#1f1f1f;border-color:#353535}
+    .format-button[disabled]{opacity:.55;cursor:not-allowed}
+    .result-note{font-size:12px;color:#858585;margin-top:14px;line-height:1.7}
+    .minimal-points{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}
+    .point{padding:18px;border-radius:18px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);text-align:left}
+    .point strong{display:block;font-size:15px;letter-spacing:-.02em;margin-bottom:6px}
+    .point span{font-size:13px;line-height:1.7;color:#8f8f8f}
+    section.info{padding:0 0 92px}
+    .info-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:22px;align-items:start}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.018));border:1px solid rgba(255,255,255,.08);border-radius:28px;padding:28px;box-shadow:var(--shadow)}
+    .section-kicker{display:inline-block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#888;font-weight:800;margin-bottom:10px}
+    .section-title{font-size:34px;letter-spacing:-.05em;margin:0 0 8px}
+    .section-desc{color:#9d9d9d;line-height:1.75;margin:0 0 24px}
+    .steps{display:grid;gap:14px}
+    .step{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:start;padding:18px;border-radius:20px;background:#111;border:1px solid var(--line-soft)}
+    .stepicon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:#171717;border:1px solid rgba(255,255,255,.08);color:#fff}
+    .step h3{margin:0 0 5px;font-size:16px;letter-spacing:-.02em}
+    .step p{margin:0;color:#8a8a8a;font-size:13px;line-height:1.7}
+    .stepnumber{font-size:12px;color:#727272;font-weight:800;padding-top:2px}
+    .faq{border-top:1px solid rgba(255,255,255,.08)}
+    .faq:last-child{border-bottom:1px solid rgba(255,255,255,.08)}
+    .faq summary{list-style:none;cursor:pointer;padding:18px 0;display:flex;justify-content:space-between;gap:12px;font-size:15px;font-weight:680;color:#f1f1f1}
+    .faq summary::-webkit-details-marker{display:none}
+    .faq summary::after{content:'+';font-size:20px;color:#8c8c8c;font-weight:400}
+    .faq[open] summary::after{content:'−'}
+    .faq p{margin:0 0 18px;color:#8f8f8f;line-height:1.8;font-size:14px}
+    footer{border-top:1px solid rgba(255,255,255,.06);padding:24px 0 34px;color:#7f7f7f;font-size:12px}
+    .foot{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .foot strong{color:#ededed}
+    @media(max-width:900px){
+      .result{grid-template-columns:1fr}
+      .minimal-points,.info-grid{grid-template-columns:1fr}
+    }
+    @media(max-width:760px){
+      .shell{width:min(100% - 28px,1120px)}
+      .nav{height:68px}
+      .navlinks a{display:none}
+      .hero{padding:56px 0 64px}
+      .lead{font-size:15px}
+      .search-panel{padding:10px;border-radius:24px}
+      .form-wrap{flex-wrap:wrap}
+      .input-wrap{min-width:100%;flex-basis:100%}
+      .ghost-btn,.primary{flex:1;justify-content:center}
+      .subrow{padding:14px 4px 2px}
+      .section-title{font-size:29px}
+    }
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell nav">
+      <a class="brand" href="#top" aria-label="SaveNest home">
+        <span class="logo">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11m-4-4 4 4 4-4"/><path d="M5 16v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></svg>
+        </span>
+        <span>SaveNest <span class="sub">minimal</span></span>
+      </a>
+      <nav class="navlinks" aria-label="Main navigation">
+        <a href="#how">How it works</a>
+        <a href="#faq">FAQ</a>
+        <span class="badge">Dark mode</span>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="shell">
+        <div class="hero-content">
+          <span class="eyebrow"><span class="dot"></span>Minimal downloader UI</span>
+          <h1>Download videos <span class="dim">without the clutter.</span></h1>
+          <p class="lead">A dark, minimalist interface for checking a YouTube link, previewing the video, and choosing a format. Clean look, simple flow, zero visual noise.</p>
+
+          <div class="search-panel">
+            <form class="form-wrap" id="downloadForm" autocomplete="off">
+              <div class="input-wrap">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7.1-7.1l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7.1 7.1l1.7-1.7"/></svg>
+                <input id="videoUrl" type="url" inputmode="url" placeholder="Paste YouTube link..." aria-label="YouTube video URL" required>
+              </div>
+              <button class="ghost-btn" type="button" id="pasteBtn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="4" width="12" height="16" rx="2"/><path d="M16 4V2H4v14h4"/></svg>
+                Paste
+              </button>
+              <button class="primary" type="submit" id="submitBtn">
+                Get video
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 14 0m-6-6 6 6-6 6"/></svg>
+              </button>
+            </form>
+            <div class="subrow">
+              <div class="supported"><strong>Supported</strong><span>YouTube</span><span>•</span><span>Shorts</span><span>•</span><span>MP4 where available</span></div>
+            </div>
+            <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
+          </div>
+
+          <div class="preview-area" id="previewArea" aria-live="polite">
+            <div class="result">
+              <div class="thumb" id="thumbnailBox">
+                <img id="thumbnail" alt="Video thumbnail">
+                <div class="playicon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="m8 5 12 7-12 7V5Z"/></svg>
+                </div>
+              </div>
+              <div>
+                <div class="smallcaps" id="resultType">YouTube video</div>
+                <div class="result-title" id="resultTitle">Your video</div>
+                <div class="result-meta" id="resultMeta"></div>
+                <div class="format-row" id="formatRow"></div>
+                <div class="result-note" id="resultNote"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="minimal-points">
+            <div class="point"><strong>Minimal UI</strong><span>Focused only on the actions users actually need.</span></div>
+            <div class="point"><strong>Dark mode</strong><span>Comfortable contrast with a premium matte feel.</span></div>
+            <div class="point"><strong>Responsive</strong><span>Still neat and clean on mobile or desktop.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="info" id="how">
+      <div class="shell info-grid">
+        <div class="card">
+          <span class="section-kicker">How it works</span>
+          <h2 class="section-title">Simple flow, no nonsense</h2>
+          <p class="section-desc">Just paste the link, check the preview, and choose a format. That’s it.</p>
+          <div class="steps">
+            <article class="step">
+              <div class="stepicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7.1-7.1l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7.1 7.1l1.7-1.7"/></svg></div>
+              <div><h3>Paste the URL</h3><p>Copy the YouTube or Shorts link and drop it into the input field.</p></div>
+              <span class="stepnumber">01</span>
+            </article>
+            <article class="step">
+              <div class="stepicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h5"/></svg></div>
+              <div><h3>Inspect the video</h3><p>The interface shows title, thumbnail and available formats if the server is running.</p></div>
+              <span class="stepnumber">02</span>
+            </article>
+            <article class="step">
+              <div class="stepicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12m-4-4 4 4 4-4M4 17v3h16v-3"/></svg></div>
+              <div><h3>Download responsibly</h3><p>Choose a format and save content only if you own it or have permission.</p></div>
+              <span class="stepnumber">03</span>
+            </article>
+          </div>
+        </div>
+
+        <div class="card" id="faq">
+          <span class="section-kicker">FAQ</span>
+          <h2 class="section-title">Need to know</h2>
+          <details class="faq"><summary>Can I open this as plain HTML?</summary><p>Yes. The dark UI, paste button, validation and thumbnail preview work as a static demo. Real format detection and downloads need the included Python server.</p></details>
+          <details class="faq"><summary>Why is the design more minimal now?</summary><p>This version intentionally removes bright colors and extra decorative sections so the page feels cleaner and more premium.</p></details>
+          <details class="faq"><summary>Can it download every YouTube video?</summary><p>No. Availability depends on permissions, source restrictions, yt-dlp support, region, and the formats the source exposes.</p></details>
+          <details class="faq"><summary>Is this the official SaveFrom site?</summary><p>No. SaveNest is an independent educational recreation with a custom dark minimalist design.</p></details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell foot">
+      <span><strong>SaveNest</strong> · dark minimal edition</span>
+      <span>Use responsibly. Respect creators and platform terms.</span>
+    </div>
+  </footer>
+
+  <script>
+  (()=>{
+    'use strict';
+    const $=id=>document.getElementById(id);
+    const form=$('downloadForm'), input=$('videoUrl'), submit=$('submitBtn'), feedback=$('feedback'), preview=$('previewArea'), formats=$('formatRow');
+    const isDemo=location.protocol==='file:';
+    let lastUrl='';
+    function say(message,type=''){feedback.textContent=message;feedback.className='feedback'+(type?' '+type:'');}
+    function parseYouTube(raw){try{const url=new URL(raw); if(!['https:','http:'].includes(url.protocol))return null; const h=url.hostname.toLowerCase();let id='';if(h==='youtu.be'||h==='www.youtu.be'){id=url.pathname.split('/').filter(Boolean)[0]||'';}else if(h==='youtube.com'||h.endsWith('.youtube.com')){id=url.searchParams.get('v')||((url.pathname.match(/^\/(?:shorts|embed|live)\/([^/?#]+)/)||[])[1])||'';}return /^[\w-]{11}$/.test(id)?id:null}catch{return null}}
+    function setLoading(on){submit.disabled=on;submit.firstChild.textContent=on?'Checking... ':'Get video ';}
+    function show(data,videoId,offline){preview.classList.add('is-visible');$('resultType').textContent='YOUTUBE · VIDEO';$('resultTitle').textContent=data.title||('YouTube video '+videoId);$('resultMeta').textContent=[data.uploader||'YouTube',data.duration?`${Math.floor(data.duration/60)}:${String(data.duration%60).padStart(2,'0')}`:null].filter(Boolean).join(' · ');const img=$('thumbnail');img.style.display='block';img.src=`https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg`;img.onerror=()=>{img.style.display='none'};formats.replaceChildren();
+      if(offline){const b=document.createElement('button');b.type='button';b.disabled=true;b.className='format-button';b.textContent='MP4 · server required';formats.append(b);$('resultNote').textContent='Preview mode only. Run run_windows.bat on Windows or python server.py to enable live format detection and downloading.';return}
+      const options=data.formats||[];if(!options.length){$('resultNote').textContent='No compatible MP4 format was returned for this video.';return}
+      for(const f of options){const a=document.createElement('a');a.className='format-button';a.href=`/api/download?url=${encodeURIComponent(lastUrl)}&format_id=${encodeURIComponent(f.id)}`;a.textContent=`↓ ${f.label}${f.size?' · '+f.size:''}`;a.setAttribute('aria-label',`Download ${f.label}`);formats.append(a)}$('resultNote').textContent='Availability depends on the source. Only save videos you own or are authorized to download.';
+    }
+    async function process(){const raw=input.value.trim();const id=parseYouTube(raw);preview.classList.remove('is-visible');if(!id){say('Please paste a valid YouTube video or Shorts URL.','error');return}lastUrl=raw;try{history.replaceState(null,'',location.protocol==='file:'?'#video':`?url=${encodeURIComponent(raw)}`)}catch{}setLoading(true);say('Checking the link…');try{if(isDemo)throw new Error('Offline demo');const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),25000);let response;try{response=await fetch('/api/info?url='+encodeURIComponent(raw),{signal:controller.signal})}finally{clearTimeout(timeout)}const data=await response.json();if(!response.ok)throw new Error(data.error||'Cannot fetch video information.');show(data,id,false);say('Video found. Choose a format below.','success')}catch(e){show({},id,true);say(isDemo?'Preview mode. Start the Python server to enable video downloads.':'Could not fetch live formats: '+(e.message||'Unknown error')+'. Showing a preview instead.','error')}finally{setLoading(false)}}
+    form.addEventListener('submit',e=>{e.preventDefault();process()});
+    $('pasteBtn').addEventListener('click',async()=>{if(!navigator.clipboard?.readText){say('Clipboard access is unavailable. Use Ctrl+V in the link field.','error');input.focus();return}try{input.value=await navigator.clipboard.readText();say('Link pasted. Hit Get video.','success');input.focus()}catch{say('Clipboard permission denied. You can paste manually with Ctrl+V.','error')}});
+    const query=new URLSearchParams(location.search).get('url');if(query){input.value=query;if(parseYouTube(query))process()}
+  })();
+  </script>
+</body>
+</html>
